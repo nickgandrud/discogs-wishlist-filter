@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Discogs Wantlist by styles</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    h2 { margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <h1>My Wantlist by styles</h1>
+  <button onclick="loadWantlist()">Load Wantlist</button>
+  <div id="results"></div>
+
+  <script>
+    async function loadWantlist() {
+      const res = await fetch("/wantlist");
+      const data = await res.json();
+      const container = document.getElementById("results");
+      container.innerHTML = "";
+
+      Object.keys(data).sort().forEach(styles => {
+        const section = document.createElement("div");
+        section.innerHTML = `<h2>${styles}</h2>`;
+
+        const ul = document.createElement("ul");
+        data[styles]
+          .sort((a,b) => a.title.localeCompare(b.title))
+         .forEach(item => {
+            const li = document.createElement("li");
+
+            const link = document.createElement("a");
+            link.href = item.url;
+            link.textContent = `${item.artist} - ${item.title} (${item.year || "Unknown"})`;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+
+            li.appendChild(link);  // append link WITH text inside it
+            ul.appendChild(li);
+        });
+
+        section.appendChild(ul);
+        container.appendChild(section);
+      });
+    }
+  </script>
+</body>
+</html>
